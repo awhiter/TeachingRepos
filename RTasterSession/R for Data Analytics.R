@@ -612,6 +612,29 @@ predvalues[predvalues<=0] <- 0
 
 rmsle(testvalues,predvalues)
 
+#######################################################
+# Predict and Visualise for 18/19 Jan 2011 
+
+bikes$day <- day(ymd_hms(bikes$datetime))
+bikes$month <- month(ymd_hms(bikes$datetime))
+
+bikestrain <- bikes[bikes$day<18, ]
+bikestest <- bikes[bikes$day>=18, ]
+
+randomforestmodel <- randomForest(count ~ ., bikestrain[,c(2:9,12:14,18)], ntree=100)
+
+predvalues <- predict(randomforestmodel,bikestest)
+predvalues[predvalues<=0] <- 0
+
+bikestest$predicted.count <- predvalues
+
+ggplot(data=bikestest[bikestest$year=="2011" & bikestest$month==1,], aes(x=datetime, group=1)) + 
+  geom_line(aes(y = count, colour = "actual")) + 
+  geom_line(aes(y = predicted.count, colour = "predicted")) +
+  theme(axis.text.x = element_text(size=6,angle=90)) + 
+  theme(legend.title=element_blank())
+
+
 
      
   
